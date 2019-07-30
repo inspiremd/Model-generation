@@ -14,7 +14,7 @@ Options:
 
 """
 from docopt import docopt
-
+from impress_md import interface_functions
 
 if __name__ == '__main__':
     arguments = docopt(__doc__, version='INSPIRE Docking 0.0.1')
