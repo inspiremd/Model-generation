@@ -1,7 +1,7 @@
 """INSPIRE Docking - Put a ligand (SMILES) in a protein (PDB)
 
 Usage:
-  docking.py -s=<SMILES> -p=<PDB>
+  docking.py -s=<SMILES> -p=<PDB> -o=<PATH>
   docking.py (-h | --help)
   docking.py --version
 
@@ -10,6 +10,7 @@ Options:
   --version     Show version.
   -s=<SMILES>   Path to file containing SMILES representation of small molecule ligand.
   -p=<PDB>      Path to PDB file containing protein target for docking.
+  -o=<PATH>     Path to write output.
 
 """
 from docopt import docopt
