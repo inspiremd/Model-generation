@@ -1,5 +1,6 @@
 import sys, os
-import conf_gen, dock_conf
+from . import conf_gen
+from . import dock_conf
 
 
 def RunDocking(smiles, pdb, outpath, padding=4):
