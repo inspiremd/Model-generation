@@ -17,11 +17,11 @@ mmgbsa.py
 
 
 To get all three metrics for a smiles, including a 1 ns mmgbsa run, pick a smiles and call
-~~
+
 python docking.py -s SMILES -p "input/com_axitinib.pdb" -o "examples/example_2"
 python mmgbsa.py -p "examples/example_2" -n 0
 python mmgbsa.py -p "examples/example_2" -n 1 
-~~
+
 
 
 Note
