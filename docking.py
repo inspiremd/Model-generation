@@ -18,4 +18,11 @@ from impress_md import interface_functions
 
 if __name__ == '__main__':
     arguments = docopt(__doc__, version='INSPIRE Docking 0.0.1')
-    print(arguments)
+    smiles = arguments['-s']
+    pdb = arguments['-p']
+    path = arguments['-o']
+    interface_functions.RunDocking(smiles,pdb,path)
+    interface_functions.ParameterizeSystem(path)
+
+
+

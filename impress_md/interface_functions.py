@@ -1,7 +1,16 @@
 import sys, os
 from . import conf_gen
 from . import dock_conf
+from contextlib import contextmanager
 
+@contextmanager
+def working_directory(directory):
+    owd = os.getcwd()
+    try:
+        os.chdir(directory)
+        yield directory
+    finally:
+        os.chdir(owd)
 
 def RunDocking(smiles, pdb, outpath, padding=4):
     if not os.path.exists(outpath):
@@ -20,31 +29,29 @@ def RunDocking(smiles, pdb, outpath, padding=4):
         metrics.write("{},{}\n".format(dock_conf.BestDockScore(dock,lig),0))
 
 
+## Somehow hop over to the path
 def ParameterizeSystem(path):
     import subprocess
-    # Run antechamber at f'{path}/lig.pdb'
-    subprocess.check_output(f'antechamber -i {path}/lig.pdb -fi pdb -o {path}/lig.mol2 -fo mol2 -c bcc -pf y -an y',shell=True)
-    subprocess.check_output(f'parmchk2 -i {path}/lig.mol2 -f mol2 -o {path}/lig.frcmod',shell=True)
-    subprocess.check_output('mv sqm* {}/'.format(path),shell=True)
+    with working_directory(path):
+        subprocess.check_output(f'antechamber -i lig.pdb -fi pdb -o lig.mol2 -fo mol2 -c bcc -pf y -an y',shell=True)
+        subprocess.check_output(f'parmchk2 -i lig.mol2 -f mol2 -o lig.frcmod',shell=True)
+        # Wrap tleap to get $path/(com|lig|apo).(inpcrd|prmtop)
+        with open(f'leap.in','w+') as leap:
+            leap.write("source leaprc.protein.ff14SBonlysc\n")
+            leap.write("source leaprc.gaff\n")
+            leap.write("set default PBRadii mbondi3\n")
+            leap.write("rec = loadPDB apo.pdb # May need full filepath?\n")
+            leap.write("saveAmberParm rec apo.prmtop apo.inpcrd\n")
+            leap.write("lig = loadmol2 lig.mol2\n")
+            leap.write("loadAmberParams lig.frcmod\n")
+            leap.write("com = combine {rec lig}\n")
+            leap.write("saveAmberParm lig lig.prmtop lig.inpcrd\n")
+            leap.write("saveAmberParm com com.prmtop com.inpcrd\n")
+            leap.write("quit\n")
+        subprocess.check_output(f'tleap -f leap.in',shell=True)
     
-    # Wrap tleap to get $path/(com|lig|apo).(inpcrd|prmtop)
-    with open(f'{path}/leap.in','w+') as leap:
-        leap.write("source leaprc.protein.ff14SBonlysc\n")
-        leap.write("source leaprc.gaff\n")
-        leap.write("set default PBRadii mbondi3\n")
-        leap.write("rec = loadPDB {}/apo.pdb # May need full filepath?\n".format(path))
-        leap.write("saveAmberParm rec {}/apo.prmtop {}/apo.inpcrd\n".format(path,path))
-        leap.write("lig = loadmol2 {}/lig.mol2\n".format(path))
-        leap.write("loadAmberParams {}/lig.frcmod\n".format(path))
-        leap.write("com = combine {rec lig}\n")
-        leap.write("saveAmberParm lig {}/lig.prmtop {}/lig.inpcrd\n".format(path,path))
-        leap.write("saveAmberParm com {}/com.prmtop {}/com.inpcrd\n".format(path,path))
-        leap.write("quit\n")
-    subprocess.check_output(f'tleap -f {path}/leap.in',shell=True)
-    subprocess.check_output('mv leap.log {}/'.format(path),shell=True)
 
-
-def RunMinimization(build_path, outpath, three_traj=True):
+def RunMinimization(build_path, outpath, one_traj=False):
     """
     We are minimizing all three structures, then checking the potential energy using GB forcefields
     We could, alternatively, minimize the docked structure and then extract trajectories (1 frame long), more like a 1-trajectory mmgbsa.
@@ -53,17 +60,17 @@ def RunMinimization(build_path, outpath, three_traj=True):
         MinimizedEnergy function requires path/prefix to inpcrd and prmtop files.
         These are created by the ParameterizeSystem function...
     """
-    from minimize import MinimizedEnergy
+    from . import minimize
     success = True
     try:
-        rec_energy = MinimizedEnergy(f'{build_path}/apo')
-        lig_energy = MinimizedEnergy(f'{build_path}/lig')
-        com_energy = MinimizedEnergy(f'{build_path}/com')
+        rec_energy = minimize.MinimizedEnergy(f'{build_path}/apo')
+        lig_energy = minimize.MinimizedEnergy(f'{build_path}/lig')
+        com_energy = minimize.MinimizedEnergy(f'{build_path}/com')
         diff_energy = com_energy - lig_energy - rec_energy
     except:
         success = False
     
-    if not three_traj:
+    if one_traj:
         print("1-traj calculation not ready")
 
     with open(f'{outpath}/metrics.csv','r') as metrics:
@@ -76,10 +83,10 @@ def RunMinimization(build_path, outpath, three_traj=True):
             metrics.write(dat[1].replace('\n',',NA,NA\n'))
 
 
-def RunMMGBSA(path, niter=1000):
-    import mmgbsa
-    crds = {'lig':f'{path}/lig.inpcrd','apo':f'{path}/apo.inpcrd','com':f'{path}/com.inpcrd'}
-    prms = {'lig':f'{path}/lig.prmtop','apo':f'{path}/apo.prmtop','com':f'{path}/com.prmtop'}
+def RunMMGBSA(inpath, outpath, niter=1000):
+    from . import mmgbsa
+    crds = {'lig':f'{inpath}/lig.inpcrd','apo':f'{inpath}/apo.inpcrd','com':f'{inpath}/com.inpcrd'}
+    prms = {'lig':f'{inpath}/lig.prmtop','apo':f'{inpath}/apo.prmtop','com':f'{inpath}/com.prmtop'}
     enthalpies = mmgbsa.simulate(crds, prms, niter)
     mmgbsa.subsample(enthalpies)
     energies = mmgbsa.mmgbsa(enthalpies)
@@ -91,7 +98,7 @@ def RunMMGBSA(path, niter=1000):
         metrics.write(dat[1].replace('\n',',{},{}\n'.format(energies[0]['diff'],energies[1]['diff'])))
     return energies
 
-def GetMetrics(smiles, method):
+def GetMetrics(smiles, pdb, outpath, method):
     """Method can be
         'dock'
         'minimize'
@@ -99,14 +106,8 @@ def GetMetrics(smiles, method):
         'absolute' - Not in use
     """
     if method == 'dock':
-        RunDocking(smiles,'input/com_axitinib.pdb','build')
-        ParameterizeSystem('build')
-    if method == 'minimize':
-        RunDocking(smiles,'input/com_axitinib.pdb','build')
-        ParameterizeSystem('build')
-        RunMinimization('build','build')
+        RunDocking(smiles,pdb,outpath)
+        ParameterizeSystem(outpath)
+        RunMinimization(outpath,outpath)
     if method == 'mmgbsa':
-        RunDocking(smiles,'input/com_axitinib.pdb','build')
-        ParameterizeSystem('build')
-        RunMinimization('build','build')
-        RunMMGBSA('build', 500)
+        RunMMGBSA(outpath, 500)

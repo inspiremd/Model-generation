@@ -59,7 +59,7 @@ def simulate(inpcrd_filenames, prmtop_filenames, niterations=1000, implicit=True
         cutoff = 2*unit.nanometers
 
         # Create system
-        # Added implicit solvent thing
+        # Implicit solvent
         system = prmtop.createSystem(implicitSolvent=app.GBn2,
                                      nonbondedMethod=method,
                                      constraints=app.HBonds,
@@ -79,6 +79,7 @@ def simulate(inpcrd_filenames, prmtop_filenames, niterations=1000, implicit=True
         openmm.LocalEnergyMinimizer.minimize(context)
 
         for iteration in range(niterations):
+            # print("On iteration",iteration,"of",niterations)
             integrator.step(nsteps_per_iteration)
             state = context.getState(getEnergy=True)
             potential_energy = state.getPotentialEnergy()
