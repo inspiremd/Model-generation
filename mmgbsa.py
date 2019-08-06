@@ -16,6 +16,8 @@ Options:
 """
 from docopt import docopt
 from impress_md import interface_functions
+import timeit
+start = timeit.default_timer()
 
 if __name__ == '__main__':
     arguments = docopt(__doc__, version='INSPIRE MMGBSA Calculator 0.0.1')
@@ -27,4 +29,8 @@ if __name__ == '__main__':
     else:
         niter = round(float(arguments['-n'])*1000)
         interface_functions.RunMMGBSA(path, path, niter)
+
+with open(f'{path}/mmgbsa.log',"w+") as logf:
+    logf.write("Execution time (sec): {}\n".format(timeit.default_timer() - start))
+
 

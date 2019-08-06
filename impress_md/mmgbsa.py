@@ -92,8 +92,6 @@ def simulate(inpcrd_filenames, prmtop_filenames, niterations=1000, implicit=True
                 enthalpies[phase][iteration] = enthalpy.value_in_unit(unit.kilojoules_per_mole)
                 #enthalpies[phase][iteration] = (potential_energy + pressure*volume) / kT
     # [mean_dG, var_dG] = mmpbsa(enthalpies)
-    # Print to file, then print the subsample one
-    # Subsample enthalpies / or not
     return enthalpies
 
 def subsample(enthalpies):

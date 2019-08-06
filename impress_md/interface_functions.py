@@ -1,6 +1,4 @@
 import sys, os
-from . import conf_gen
-from . import dock_conf
 from contextlib import contextmanager
 
 @contextmanager
@@ -13,6 +11,8 @@ def working_directory(directory):
         os.chdir(owd)
 
 def RunDocking(smiles, inpath, outpath, padding=4):
+    from . import conf_gen
+    from . import dock_conf
     if not os.path.exists(outpath):
         os.mkdir(outpath)
     confs = conf_gen.SelectEnantiomer(conf_gen.FromString(smiles))

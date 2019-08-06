@@ -28,5 +28,5 @@ if __name__ == '__main__':
     interface_functions.ParameterizeSystem(path)
 
 with open(f'{path}/docking.log',"w+") as logf:
-    logf.write("Execution time (sec): {}".format(timeit.default_timer() - start))
+    logf.write("Execution time (sec): {}\n".format(timeit.default_timer() - start))
 

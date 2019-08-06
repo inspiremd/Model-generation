@@ -9,10 +9,10 @@ def MinimizedEnergy(filepath):
 
     integrator = mm.LangevinIntegrator(300*unit.kelvin, 1.0/unit.picoseconds, 2.0*unit.femtoseconds)
     integrator.setConstraintTolerance(0.00001)
-    # platform = mm.Platform.getPlatformByName('CUDA')
+    platform = mm.Platform.getPlatformByName('CUDA')
     # properties = {'CudaPrecision': 'mixed'}
     
-    simulation = app.Simulation(prmtop.topology, system, integrator)
+    simulation = app.Simulation(prmtop.topology, system, integrator, platform)
     simulation.context.setPositions(inpcrd.positions)
     
     simulation.minimizeEnergy()
