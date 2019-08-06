@@ -12,15 +12,16 @@ def working_directory(directory):
     finally:
         os.chdir(owd)
 
-def RunDocking(smiles, pdb, outpath, padding=4):
+def RunDocking(smiles, inpath, outpath, padding=4):
     if not os.path.exists(outpath):
         os.mkdir(outpath)
     confs = conf_gen.SelectEnantiomer(conf_gen.FromString(smiles))
     # This receptor can be pre-compiled to an oeb. It may speed things up notably
-    if not os.path.exists(f'{outpath}/receptor.oeb'):
-        receptor = dock_conf.PrepareReceptor(pdb,padding,outpath)
-    else:
-        receptor = dock_conf.PrepareReceptorFromBinary(f'{outpath}/receptor.oeb')
+    filename, file_extension = os.path.splitext(inpath)
+    if file_extension == ".oeb":
+        receptor = dock_conf.PrepareReceptorFromBinary(inpath)
+    else: # else it is a pdb
+        receptor = dock_conf.PrepareReceptor(inpath,padding,outpath)
     dock, lig = dock_conf.DockConf(receptor,confs,MAX_POSES=1)
 
     dock_conf.WriteStructures(receptor, lig, f'{outpath}/apo.pdb', f'{outpath}/lig.pdb')
