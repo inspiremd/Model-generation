@@ -26,11 +26,13 @@ if __name__ == '__main__':
 
     if arguments['-n'] is None or float(arguments['-n'])*1000 == 0:
         interface_functions.RunMinimization(path, path, one_traj)
+        with open(f'{path}/minimization.log',"w+") as logf:
+            logf.write("Execution time (sec): {}\n".format(timeit.default_timer() - start))
     else:
         niter = round(float(arguments['-n'])*1000)
         interface_functions.RunMMGBSA(path, path, niter)
+        with open(f'{path}/mmgbsa.log',"w+") as logf:
+            logf.write("Execution time (sec): {}\n".format(timeit.default_timer() - start))
 
-with open(f'{path}/mmgbsa.log',"w+") as logf:
-    logf.write("Execution time (sec): {}\n".format(timeit.default_timer() - start))
 
 

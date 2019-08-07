@@ -13,8 +13,8 @@ def working_directory(directory):
 def RunDocking(smiles, inpath, outpath, padding=4):
     from . import conf_gen
     from . import dock_conf
-    if not os.path.exists(outpath):
-        os.mkdir(outpath)
+    # if not os.path.exists(outpath):
+    #     os.mkdir(outpath)
     confs = conf_gen.SelectEnantiomer(conf_gen.FromString(smiles))
     # This receptor can be pre-compiled to an oeb. It may speed things up notably
     filename, file_extension = os.path.splitext(inpath)
@@ -28,7 +28,9 @@ def RunDocking(smiles, inpath, outpath, padding=4):
     with open(f'{outpath}/metrics.csv','w+') as metrics:
         metrics.write("Dock,Dock_U\n")
         metrics.write("{},{}\n".format(dock_conf.BestDockScore(dock,lig),0))
-
+    from openeye import oedepict
+    oedepict.OEPrepareDepiction(lig)
+    oedepict.OERenderMolecule(f'{outpath}/lig.png',lig)
 
 ## Somehow hop over to the path
 def ParameterizeSystem(path):
