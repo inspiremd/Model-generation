@@ -21,7 +21,7 @@ There are three command line executables.
 * Dependencies: OpenMM, numpy, pymbar
 
 
-To get all three metrics for a smiles, including a 1 ns mmgbsa run, pick a smiles and call
+To get the first two metrics for a smiles, pick a smiles and call
 ~~~
 python 0_docking.py -s $SMILES -i "input/com_axitinib.pdb" -o "test"
 ./1_ante.sh test
@@ -31,3 +31,4 @@ python 2_mmgbsa.py -p "test" -n 0
 
 Note
 Antechamber is taking a long time (~10 minutes) to run on my computer here, as is OpenMM. I found it took long on tetrazole rings. Dave had issues with phosphates & things that should be charged. 
+Something is going wrong with 2_mmgbsa for -n 1. It runs locally and on Summit's login nodes, but when submitted through jsrun.
