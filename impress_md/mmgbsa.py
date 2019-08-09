@@ -68,20 +68,23 @@ def simulate(inpcrd_filenames, prmtop_filenames, niterations=1000, implicit=True
 
         # Create integrator and context
         integrator = openmm.LangevinIntegrator(temperature, collision_rate, timestep)
-        context = openmm.Context(system, integrator)
-        context.setPositions(inpcrd.getPositions())
+
+        # platform = openmm.Platform.getPlatformByName('CUDA')
+        simulation = app.Simulation(prmtop.topology, system, integrator)
+        simulation.context.setPositions(inpcrd.getPositions())
+        
         if not implicit:
-            context.setPeriodicBoxVectors(inpcrd.getPeriodicBoxVectors())
+            simulation.context.setPeriodicBoxVectors(inpcrd.getPeriodicBoxVectors())
 
         # Sample and store enthalpies
         enthalpies[phase] = np.zeros([niterations])
 
-        openmm.LocalEnergyMinimizer.minimize(context)
+        openmm.LocalEnergyMinimizer.minimize(simulation.context)
 
         for iteration in range(niterations):
             # print("On iteration",iteration,"of",niterations)
             integrator.step(nsteps_per_iteration)
-            state = context.getState(getEnergy=True)
+            state = simulation.context.getState(getEnergy=True)
             potential_energy = state.getPotentialEnergy()
 
             if implicit:
@@ -90,8 +93,6 @@ def simulate(inpcrd_filenames, prmtop_filenames, niterations=1000, implicit=True
                 volume = state.getPeriodicBoxVolume()
                 enthalpy = potential_energy + (pressure * volume).in_unit_system(unit.si_unit_system) / unit.mole
                 enthalpies[phase][iteration] = enthalpy.value_in_unit(unit.kilojoules_per_mole)
-                #enthalpies[phase][iteration] = (potential_energy + pressure*volume) / kT
-    # [mean_dG, var_dG] = mmpbsa(enthalpies)
     return enthalpies
 
 def subsample(enthalpies):

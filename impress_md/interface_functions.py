@@ -32,7 +32,9 @@ def RunDocking(smiles, inpath, outpath, padding=4):
     oedepict.OEPrepareDepiction(lig)
     oedepict.OERenderMolecule(f'{outpath}/lig.png',lig)
 
-## Somehow hop over to the path
+# DEPRICATED -- this doesn't run on rhea properly for some reason
+# It may be due to a write-permission on Rhea that is now fixed.
+# In any event, I'm running it through a bash script (ante.sh) now
 def ParameterizeSystem(path):
     import subprocess
     with working_directory(path):
@@ -90,7 +92,9 @@ def RunMMGBSA(inpath, outpath, niter=1000):
     from . import mmgbsa
     crds = {'lig':f'{inpath}/lig.inpcrd','apo':f'{inpath}/apo.inpcrd','com':f'{inpath}/com.inpcrd'}
     prms = {'lig':f'{inpath}/lig.prmtop','apo':f'{inpath}/apo.prmtop','com':f'{inpath}/com.prmtop'}
+    print("Starting simulation...")
     enthalpies = mmgbsa.simulate(crds, prms, niter)
+    print("Subsampling to reduce variance")
     mmgbsa.subsample(enthalpies)
     energies = mmgbsa.mmgbsa(enthalpies)
     # Now write this to file

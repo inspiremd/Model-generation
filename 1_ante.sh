@@ -1,4 +1,5 @@
 #!/bin/bash
+# There is one argument -- the path to the ligand
 start=`date +%s`
 
 path=$1
