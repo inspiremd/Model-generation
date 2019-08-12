@@ -23,7 +23,7 @@ There are three command line executables.
 
 To get the first two metrics for a smiles, pick a smiles and call
 ~~~
-python 0_docking.py -s $SMILES -i "input/com_axitinib.pdb" -o "test"
+python 0_docking.py -s $SMILES -i "input/receptor.oeb" -o "test"
 ./1_ante.sh test
 python 2_mmgbsa.py -p "test" -n 0 
 ~~~
