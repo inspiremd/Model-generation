@@ -89,7 +89,7 @@ def RunMinimization(build_path, outpath, one_traj=False):
 
 
 def RunMMGBSA(inpath, outpath, niter=1000):
-    from . import mmgbsa_new
+    from . import mmgbsa
     crds = {'lig':f'{inpath}/lig.inpcrd','apo':f'{inpath}/apo.inpcrd','com':f'{inpath}/com.inpcrd'}
     prms = {'lig':f'{inpath}/lig.prmtop','apo':f'{inpath}/apo.prmtop','com':f'{inpath}/com.prmtop'}
     print("Starting simulation...")

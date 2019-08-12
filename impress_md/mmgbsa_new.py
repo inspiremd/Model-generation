@@ -16,7 +16,7 @@ def simulate(inpcrd_filenames, prmtop_filenames, niterations=1000, implicit=True
         prmtop = app.AmberPrmtopFile(prmtop_filenames[phase])
         inpcrd = app.AmberInpcrdFile(inpcrd_filenames[phase])
         
-        system = prmtop.createSystem(implicitSovlent=app.GBn2, 
+        system = prmtop.createSystem(implicitSolvent=app.GBn2, 
                  nonbondedMethod=app.CutoffNonPeriodic,
                  nonbondedCutoff=2.0*unit.nanometers, 
                  constraints=app.HBonds)
