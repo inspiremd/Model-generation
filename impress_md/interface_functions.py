@@ -28,9 +28,9 @@ def RunDocking(smiles, inpath, outpath, padding=4):
     with open(f'{outpath}/metrics.csv','w+') as metrics:
         metrics.write("Dock,Dock_U\n")
         metrics.write("{},{}\n".format(dock_conf.BestDockScore(dock,lig),0))
-    from openeye import oedepict
-    oedepict.OEPrepareDepiction(lig)
-    oedepict.OERenderMolecule(f'{outpath}/lig.png',lig)
+    # from openeye import oedepict
+    # oedepict.OEPrepareDepiction(lig)
+    # oedepict.OERenderMolecule(f'{outpath}/lig.png',lig)
 
 # DEPRICATED -- this doesn't run on rhea properly for some reason
 # It may be due to a write-permission on Rhea that is now fixed.
@@ -89,12 +89,12 @@ def RunMinimization(build_path, outpath, one_traj=False):
 
 
 def RunMMGBSA(inpath, outpath, niter=1000):
-    from . import mmgbsa
+    from . import mmgbsa_new as mmgbsa
     crds = {'lig':f'{inpath}/lig.inpcrd','apo':f'{inpath}/apo.inpcrd','com':f'{inpath}/com.inpcrd'}
     prms = {'lig':f'{inpath}/lig.prmtop','apo':f'{inpath}/apo.prmtop','com':f'{inpath}/com.prmtop'}
-    print("Starting simulation...")
+    # print("Starting simulation...")
     enthalpies = mmgbsa.simulate(crds, prms, niter)
-    print("Subsampling to reduce variance")
+    # print("Subsampling to reduce variance")
     mmgbsa.subsample(enthalpies)
     energies = mmgbsa.mmgbsa(enthalpies)
     # Now write this to file

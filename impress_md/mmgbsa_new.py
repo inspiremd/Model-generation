@@ -13,6 +13,7 @@ def simulate(inpcrd_filenames, prmtop_filenames, niterations=1000, implicit=True
     
     enthalpies = dict()
     for phase in phases:
+        enthalpies[phase] = np.zeros([niterations])
         prmtop = app.AmberPrmtopFile(prmtop_filenames[phase])
         inpcrd = app.AmberInpcrdFile(inpcrd_filenames[phase])
         
@@ -38,7 +39,7 @@ def simulate(inpcrd_filenames, prmtop_filenames, niterations=1000, implicit=True
             simulation.step(nsteps_per_iteration)
             state = simulation.context.getState(getEnergy=True)
             potential_energy = state.getPotentialEnergy()
-            enthalpies[phase][iteration] = potential_energy.value_in_units(unit.kilojoules_per_mole)
+            enthalpies[phase][iteration] = potential_energy.value_in_unit(unit.kilojoules_per_mole)
     return enthalpies
 
 def subsample(enthalpies):
