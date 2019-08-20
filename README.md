@@ -24,5 +24,6 @@ python 1_mmgbsa.py -p "test" -n 0
 
 
 Note
+
 Parameterization is done using OpenEye's AM1BCC charges. 
 Something is going wrong with mmgbsa for -n 1. It runs locally and on Summit's login nodes, but CUDA is not properly recognized when submitted through jsrun.
