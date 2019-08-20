@@ -27,9 +27,12 @@ if __name__ == '__main__':
     
     path = arguments['-o']
     interface_functions.RunDocking(smiles,struct,path)
+    docked_time = timeit.default_timer()
     if arguments['-p']:
-        interface_functions.ParameterizeSystem(path)
+        interface_functions.ParameterizeOE(path)
 
 with open(f'{path}/docking.log',"w+") as logf:
-    logf.write("Execution time (sec): {}\n".format(timeit.default_timer() - start))
+    logf.write("Docking time (sec): {}\n".format(docked_time - start))
+    if arguments['-p']:
+        logf.write("Param time (sec): {}\n".format(timeit.default_timer() - docked_time))
 

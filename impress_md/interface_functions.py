@@ -32,9 +32,45 @@ def RunDocking(smiles, inpath, outpath, padding=4):
     # oedepict.OEPrepareDepiction(lig)
     # oedepict.OERenderMolecule(f'{outpath}/lig.png',lig)
 
+def ParameterizeOE(path):
+    """
+    Reads in the PDB from 'RunDocking' and outputs 'charged.mol2' of the ligand
+    """
+    from openeye import oechem, oeomega, oequacpac
+    mol = oechem.OEMol()
+    ifs = oechem.oemolistream()
+    if ifs.open(f'{path}/lig.pdb'):
+        oechem.OEReadMolecule(ifs,mol)
+        ifs.close()
+    if not oequacpac.OEAssignCharges(mol,oequacpac.OEAM1BCCCharges()):
+        raise(RuntimeError("OEAssignCharges failed."))
+    ofs = oechem.oemolostream()
+    if ofs.open(f'{path}/charged.mol2'):
+        oechem.OEWriteMolecule(ofs,mol)
+    
+    import subprocess
+    with working_directory(path):
+        subprocess.check_output(f'antechamber -i lig.pdb -fi pdb -o lig.mol2 -fo mol2 -pf y -an y -a charged.mol2 -fa mol2 -ao crg',shell=True)
+        subprocess.check_output(f'parmchk2 -i lig.mol2 -f mol2 -o lig.frcmod',shell=True)
+        # Wrap tleap to get $path/(com|lig|apo).(inpcrd|prmtop)
+        with open(f'leap.in','w+') as leap:
+            leap.write("source leaprc.protein.ff14SBonlysc\n")
+            leap.write("source leaprc.gaff\n")
+            leap.write("set default PBRadii mbondi3\n")
+            leap.write("rec = loadPDB apo.pdb # May need full filepath?\n")
+            leap.write("saveAmberParm rec apo.prmtop apo.inpcrd\n")
+            leap.write("lig = loadmol2 lig.mol2\n")
+            leap.write("loadAmberParams lig.frcmod\n")
+            leap.write("com = combine {rec lig}\n")
+            leap.write("saveAmberParm lig lig.prmtop lig.inpcrd\n")
+            leap.write("saveAmberParm com com.prmtop com.inpcrd\n")
+            leap.write("quit\n")
+        subprocess.check_output(f'tleap -f leap.in',shell=True)
+
+
 # DEPRICATED -- this doesn't run on rhea properly for some reason
 # It may be due to a write-permission on Rhea that is now fixed.
-# In any event, I'm running it through a bash script (ante.sh) now
+# In any event, I'm running it in OE now.
 def ParameterizeSystem(path):
     import subprocess
     with working_directory(path):
@@ -104,17 +140,3 @@ def RunMMGBSA(inpath, outpath, niter=1000):
         metrics.write(dat[0].replace('\n',',mmgbsa,mmgbsa_U\n'))
         metrics.write(dat[1].replace('\n',',{},{}\n'.format(energies[0]['diff'],energies[1]['diff'])))
     return energies
-
-def GetMetrics(smiles, pdb, outpath, method):
-    """Method can be
-        'dock'
-        'minimize'
-        'mmgbsa'
-        'absolute' - Not in use
-    """
-    if method == 'dock':
-        RunDocking(smiles,pdb,outpath)
-        ParameterizeSystem(outpath)
-        RunMinimization(outpath,outpath)
-    if method == 'mmgbsa':
-        RunMMGBSA(outpath, 500)
