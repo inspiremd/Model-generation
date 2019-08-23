@@ -11,7 +11,7 @@ There are two command line executables.
 ## 1_mmgbsa.py
 * This command should only be run after docking.py. 
 * Takes the path to a directory where the input coordinates and parameters are saved. This should be the output path from the docking.py command.
-* Also takes the nanosecond length of the simulation. 0 corresponds to an energy minimization. <b> This does not work properly for n != 0.</b>
+* Also takes the nanosecond length of the simulation. 0 corresponds to an energy minimization.
 * Output adds to the metrics.csv file
 * Dependencies: OpenMM, numpy, pymbar
 
