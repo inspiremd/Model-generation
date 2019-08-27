@@ -25,7 +25,7 @@ def simulate(inpcrd_filenames, prmtop_filenames, niterations=1000, implicit=True
         integrator.setConstraintTolerance(0.00001)
         
         platform = mm.Platform.getPlatformByName('CUDA')
-        properties = {'CudaPrecision': 'mixed'}
+        properties = {'CudaPrecision': 'mixed', 'CudaDeviceIndex' : '0'}
         simulation = app.Simulation(prmtop.topology, system, integrator, platform, properties)
         simulation.context.setPositions(inpcrd.positions)
         
@@ -40,6 +40,9 @@ def simulate(inpcrd_filenames, prmtop_filenames, niterations=1000, implicit=True
             state = simulation.context.getState(getEnergy=True)
             potential_energy = state.getPotentialEnergy()
             enthalpies[phase][iteration] = potential_energy.value_in_unit(unit.kilojoules_per_mole)
+        del simulation
+        del system
+        del platform
     return enthalpies
 
 def subsample(enthalpies):
