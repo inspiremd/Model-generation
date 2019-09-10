@@ -45,6 +45,6 @@ def FromString(smiles, isomer=True, num_enantiomers=1):
     else:
         return FromMol(mol,isomer,num_enantiomers)
 
-# This is clearly not the right way to do it. TODO
+# TODO: Placeholder
 def SelectEnantiomer(mol_list):
     return mol_list[0]

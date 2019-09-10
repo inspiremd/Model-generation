@@ -11,6 +11,16 @@ def PrepareReceptor(pdb,padding=4,outpath=""):
     if ifs.open(pdb):
         oechem.OEReadPDBFile(ifs, com)
         ifs.close()
+
+    """
+    Sorry, this requires some explanation. Openeye wasn't recognizing the previously docked ligand, so I tried to find other ways.
+    The next blocks of code take our system and split it based on its connected components, for which its REQUIRED that our protein
+      only has a single chain. It assumes that the last component is the ligand. It then creates the ligand (lig) and protein (prot)
+      as separate molecules. Next, it finds the minimum and maximum 3D coordinates of the current ligand and produces a box around
+      it with the specified padding. Finally it uses this box to create a 'receptor' object into which ligands can be docked.
+    Only the receptor is returned.
+    Openeye's docking shouldn't be this involved, but I couldn't get it to run the typical 'hybrid' docking without error.
+    """
     oechem.OEDetermineConnectivity(com)
     nparts, connect = oechem.OEDetermineComponents(com)
     if(nparts != 2):
@@ -63,6 +73,10 @@ def PrepareReceptor(pdb,padding=4,outpath=""):
     return receptor
 
 def PrepareReceptorFromBinary(filename):
+    """
+    If a receptor.oeb has been created, use this version.
+    If not, run 'PrepareReceptor' and a receptor.oeb will be created.
+    """
     receptor = oechem.OEGraphMol()
     oedocking.OEReadReceptorFile(receptor,filename)
     return receptor
@@ -72,7 +86,8 @@ def DockConf(receptor, mol, MAX_POSES = 5):
     dock.Initialize(receptor)
     lig = oechem.OEMol()
     err = dock.DockMultiConformerMolecule(lig,mol,MAX_POSES)
-    # print("Error?",err)
+    # TODO: should do some sort of error checking here. outputs will both be empty molecules
+    #       if it doesn't run properly.
     return dock, lig
 
 def WriteStructures(receptor, lig, apo_path, lig_path):
@@ -83,7 +98,7 @@ def WriteStructures(receptor, lig, apo_path, lig_path):
         ofs.close()
     else:
         success = False
-    # If MAX_POSES != 1, we should select the top pose to save
+    # TODO: If MAX_POSES != 1, we should select the top pose to save
     conf = list(lig.GetConfs())[0]
     if ofs.open(lig_path):
         oechem.OEWriteMolecule(ofs,conf)
@@ -102,15 +117,3 @@ def BestDockScore(dock, lig):
 def ScoreRange(dock,lig):
     tmp = LigandScores(dock,lig)
     return tmp[0],tmp[-1]
-
-### Not in use
-def GetMetrics(dock,lig):
-    """ Outputs a single line for a matrix
-    name, smiles, score_max, score_min 
-    """
-    out = []
-    out.append(lig.GetTitle())
-    out.append(oechem.OEMolToSmiles(lig))
-    out += list(ScoreRange(dock,lig))
-    # Add energy-minimized MMPBSA
-    return out
