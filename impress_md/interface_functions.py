@@ -156,3 +156,16 @@ def RunMMGBSA(inpath, outpath, niter=1000):
         metrics.write(dat[0].replace('\n',',mmgbsa,mmgbsa_U\n'))
         metrics.write(dat[1].replace('\n',',{},{}\n'.format(energies[0]['diff'],energies[1]['diff'])))
     return energies
+
+def RunAlchemy(path, niter=2500, nsteps_per_iter=1000, nlambda=11):
+    """
+    Default is a 5 ns simulation with sampling every 2 ps
+    """
+    from . import alchemy
+    [energy, err] = alchemy.SimulateAlchemy(path, niter, nsteps_per_iter, nlambda)
+    with open(f'{path}/metrics.csv','r') as metrics:
+        dat = metrics.readlines()
+    with open(f'{path}/metrics.csv','w') as metrics:
+        metrics.write(dat[0].replace('\n',',alchemy,alchemy_U\n'))
+        metrics.write(dat[1].replace('\n',',{},{}\n'.format(energy,err)))
+    return energy, err
