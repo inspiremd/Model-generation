@@ -9,14 +9,14 @@ def AddAlchemyForces(system, ligand_ind):
     """
     forces = {force.__class__.__name__ : force for force in system.getForces()}
     nbforce = forces['NonbondedForce']
-
+    
     ligand  = ligand_ind
     protein = set(range(system.getNumParticles())) - ligand
     
     alchemical_energy  = 'lambda*4*epsilon*x*(x-1.0); x = (sigma/reff_sterics)^6;'
     alchemical_energy += 'reff_sterics = sigma*(0.5*(1.0-lambda) + (r/sigma)^6)^(1/6);'
     alchemical_energy += 'sigma = 0.5*(sigma1+sigma2); epsilon = sqrt(epsilon1*epsilon2);'
-
+    
     alchemical_force = mm.CustomNonbondedForce(alchemical_energy)
     alchemical_force.addGlobalParameter('lambda',1.0)
     alchemical_force.addPerParticleParameter('sigma')
@@ -70,30 +70,31 @@ def SimulateAlchemy(path, niter, nsteps_per_iter, nlambda):
     import numpy as np
     from pymbar import MBAR, timeseries
     lambdas = np.linspace(1.0, 0.0, nlambda)
-    nstates = len(lambdas)
 
     # Save the potential energies for MBAR
-    u_kln = np.zeros([nstates, nstates, niter])
+    u_kln = np.zeros([nlambda, nlambda, niter])
     kT = unit.AVOGADRO_CONSTANT_NA * unit.BOLTZMANN_CONSTANT_kB * integrator.getTemperature()
-    for k in range(nstates):
+    for k in range(nlambda):
         for i in range(niter):
             print('state %5d iteration %5d / %5d' % (k, i, niter))
-            context.setParameter('lambda',lambdas[k])
-            integrator.step(nsteps_per_iteration)
-            for l in range(nstates):
-                context.setParameter('lambda',lambdas[l])
-                u_kln[k,l,i] = context.getState(getEnergy=True).getPotentialEnergy() / kT
+            simulation.context.setParameter('lambda',lambdas[k])
+            integrator.step(nsteps_per_iter)
+            for l in range(nlambda):
+                simulation.context.setParameter('lambda',lambdas[l])
+                u_kln[k,l,i] = simulation.context.getState(getEnergy=True).getPotentialEnergy() / kT
 
     # Subsample to reduce variation
-    N_k = np.zeros([nstates]) # number of uncorrelated samples
-    for k in range(nstates):
+    N_k = np.zeros([nlambda], np.int32) # number of uncorrelated samples
+    for k in range(nlambda):
         [t0, g, Neff_max] = timeseries.detectEquilibration(u_kln[k,k,:])
+        # TODO: maybe should use 't0:' instead of ':' in third index
         indices = timeseries.subsampleCorrelatedData(u_kln[k,k,:], g=g)
         N_k[k] = len(indices)
         u_kln[k,:,0:N_k[k]] = u_kln[k,:,indices].T
     # Calculate the energy difference
+    # TODO: I've never worked with pymbar beyond the timeseries function. I'm not sure how the error in DeltaF is calculated, and I don't know what Theta is right now.
     mbar = MBAR(u_kln,N_k)
     [DeltaF_ij, dDeltaF_ij, Theta_ij] = mbar.getFreeEnergyDifferences()
-    return DeltaF_ij, dDeltaF_ij
+    return DeltaF_ij[0][-1], dDeltaF_ij[0][-1]
 
 

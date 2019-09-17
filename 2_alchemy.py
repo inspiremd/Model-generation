@@ -23,7 +23,7 @@ if __name__ == '__main__':
     path = arguments['-i']
     nsteps_per_iter = 1000 # 2 ps
     niter = round(500 * float(arguments['-n']))
-    nlambda = arguments['-l']
+    nlambda = int(arguments['-l'])
     
     interface_functions.RunAlchemy(path,niter,nsteps_per_iter,nlambda)
     with open(f'{path}/alchemical.log',"w+") as logf:
