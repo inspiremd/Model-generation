@@ -75,7 +75,7 @@ def ParameterizeOE(path):
         subprocess.check_output(f'tleap -f leap.in',shell=True)
 
 
-def ParameterizeSystem(path):
+def ParameterizeAMBER(path):
     """
     Alternative method for parameterizing the system. It uses sqm and runs much slower than
     ParameterizeOE, which works through OpenEye.
