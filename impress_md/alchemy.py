@@ -70,10 +70,10 @@ def SimulateAlchemy(path, niter, nsteps_per_iter, nlambda):
     import numpy as np
     from pymbar import MBAR, timeseries
     lambdas = np.linspace(1.0, 0.0, nlambda)
-
     # Save the potential energies for MBAR
     u_kln = np.zeros([nlambda, nlambda, niter])
     kT = unit.AVOGADRO_CONSTANT_NA * unit.BOLTZMANN_CONSTANT_kB * integrator.getTemperature()
+    # TODO: This runs in series. Someone comfortable with MPI should help parallelize this.
     for k in range(nlambda):
         for i in range(niter):
             print('state %5d iteration %5d / %5d' % (k, i, niter))
