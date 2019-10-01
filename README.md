@@ -20,7 +20,9 @@ There are two command line executables.
 
 ## alchem.py
 * Uses an alchemical method to calculate the absolute binding free energy of a ligand.
-* User enters
+* User enters the number of lambda windows and the length of simulation at each window.
+* The windows run in series but this could be parallelized.
+* Applying constraints should increase the convergence of the system
 
 To get the four metrics for a smiles, including a 5 ns simulation, pick a smiles and call
 ~~~bash
