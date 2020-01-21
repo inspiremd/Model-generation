@@ -6,6 +6,8 @@ def PrepareReceptor(pdb,padding=4,outpath=""):
     Padding controls the docking region.
     If outpath is given, PrepareReceptor will write an openeye binary (oeb) of the receptor structure. This will be faster than rebuilding the receptor every time.
     """
+    print("STOP CALLING THIS FUNCTION")
+    exit()
     com = oechem.OEGraphMol()
     ifs = oechem.oemolistream()
     if ifs.open(pdb):
@@ -25,12 +27,14 @@ def PrepareReceptor(pdb,padding=4,outpath=""):
     nparts, connect = oechem.OEDetermineComponents(com)
     if(nparts != 2):
         print("ERR in dock_conf::prepareReceptor. PDB doesn't have 2 connected components")
+        exit()
         ## TODO: What is a good way to catch errors?
     # Get apo
     pred = oechem.OEPartPredAtom(connect)
     pred.SelectPart(nparts)
     lig = oechem.OEGraphMol()
     oechem.OESubsetMol(lig, com, pred)
+    print(lig)
     
     # Get protein
     pred = oechem.OEPartPredAtom(connect)
@@ -42,6 +46,7 @@ def PrepareReceptor(pdb,padding=4,outpath=""):
     x_min = y_min = z_min = float('inf')
     x_max = y_max = z_max = -float('inf')
     crd = lig.GetCoords()
+    print("CRD", crd)
     for atm in crd:
         x,y,z = crd[atm]
         if x < x_min:
@@ -62,10 +67,11 @@ def PrepareReceptor(pdb,padding=4,outpath=""):
     x_max += padding
     y_max += padding
     z_max += padding
-    
+    print(x_min,y_min,z_max, y_max)
     # Now prepare the receptor
     receptor = oechem.OEGraphMol()
-    box = oedocking.OEBox(x_max, y_max, z_max, x_min, y_min, z_min)
+    box = oedocking.OEBox()
+    box.Setup(x_max, y_max, z_max, x_min, y_min, z_min)
     oedocking.OEMakeReceptor(receptor, prot, box)
     
     if not outpath == "":
@@ -81,14 +87,14 @@ def PrepareReceptorFromBinary(filename):
     oedocking.OEReadReceptorFile(receptor,filename)
     return receptor
 
-def DockConf(receptor, mol, MAX_POSES = 5):
+def DockConf(pdb_file, mol, MAX_POSES = 5):
+    receptor = oechem.OEGraphMol()
+    oedocking.OEReadReceptorFile(receptor, pdb_file)
     dock = oedocking.OEDock()
     dock.Initialize(receptor)
     lig = oechem.OEMol()
     err = dock.DockMultiConformerMolecule(lig,mol,MAX_POSES)
-    # TODO: should do some sort of error checking here. outputs will both be empty molecules
-    #       if it doesn't run properly.
-    return dock, lig
+    return dock, lig, receptor
 
 def WriteStructures(receptor, lig, apo_path, lig_path):
     ofs = oechem.oemolostream()

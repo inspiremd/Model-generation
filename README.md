@@ -1,3 +1,20 @@
+This runs of x86 ONLY for the moment. 
+
+Build the conda enviroment using the yml file or just run stuff and figure out how to make it work (it's not rocket science ;)
+
+You can run end to end with 
+```python 
+mpiexec -np 8 python runner.py input/john_smiles_kinasei.smi
+```
+
+You can alter how those runs peform using the policy file.
+
+In the future, this workflow will be moved to Radical/ENTK, but for now this works. 
+
+
+
+---- 
+
 # Model-generation
 Python scripts to generate an MD-ready model from smiles strings and run simple free energy calculations 
 

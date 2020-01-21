@@ -24,6 +24,7 @@ if __name__ == '__main__':
     struct = arguments['-i']
     
     path = arguments['-o']
+
     interface_functions.RunDocking(smiles,struct,path)
     docked_time = timeit.default_timer()
 
