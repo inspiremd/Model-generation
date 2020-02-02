@@ -196,6 +196,30 @@ def RunMinimization_(build_path, outpath, one_traj=False):
         return np.nan
 
 
+def Simulation_explicit(inpath, outpath, nsteps, comp='com'):
+    if not os.path.exists(outpath):
+        os.mkdir(outpath)
+
+    from . import minimize
+    success = True
+    try:
+        potential = minimize.simulation(f'{inpath}/{comp}', outpath, nsteps)
+    except:
+        success = False
+
+    with open(f'{inpath}/metrics.csv','r') as metrics:
+        dat = metrics.readlines()
+    with open(f'{inpath}/metrics.csv','w') as metrics:
+        metrics.write(dat[0].replace('\n',',U_minimized_explicit\n'))
+        if success:
+            metrics.write(dat[1].replace('\n',',{}\n'.format(potential)))
+        else:
+            metrics.write(dat[1].replace('\n',',NA\n'))
+    if success:
+        return potential
+    else:
+        return np.nan
+
 def RunMMGBSA(inpath, outpath, niter=1000):
     """
     1 'iteration' corresponds to 1 ps.
