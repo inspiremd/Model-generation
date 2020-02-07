@@ -210,7 +210,7 @@ def Simulation_explicit(inpath, outpath, nsteps, comp='com'):
     with open(f'{inpath}/metrics.csv','r') as metrics:
         dat = metrics.readlines()
     with open(f'{inpath}/metrics.csv','w') as metrics:
-        metrics.write(dat[0].replace('\n',',U_minimized_explicit\n'))
+        metrics.write(dat[0].replace('\n',',U_mean_explicit\n'))
         if success:
             metrics.write(dat[1].replace('\n',',{}\n'.format(potential)))
         else:

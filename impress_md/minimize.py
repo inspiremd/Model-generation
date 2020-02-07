@@ -70,13 +70,25 @@ def simulation(filepath, outpath, nsteps):
     simulation.context.setPositions(modeller.positions)
     simulation.minimizeEnergy()
     if nsteps != 0:
-        simulation.reporters.append(app.DCDReporter(f'{outpath}/traj.dcd', 25000))
+        simulation.reporters.append(app.DCDReporter(f'{outpath}/traj.dcd', 25000)) # snapshot at every 50 ps 
         simulation.reporters.append(app.StateDataReporter(f'{outpath}/sim.log', 25000, step=True,
-        potentialEnergy=True, temperature=True))
-        simulation.reporters.append(app.CheckpointReporter(f'{outpath}/traj.chk', 250000))
+        potentialEnergy=True, temperature=True)) # reporting at every 50 ps
+        simulation.reporters.append(app.CheckpointReporter(f'{outpath}/traj.chk', 250000)) # checkpoint at every 0.5 ns
         simulation.step(nsteps)
         positions = simulation.context.getState(getPositions=True).getPositions()
         app.PDBFile.writeFile(simulation.topology, positions, open(f'{outpath}/output.pdb', 'w'))
-    potential = simulation.context.getState(getEnergy=True).getPotentialEnergy().value_in_unit(unit.kilojoule/unit.mole)
+
+# Return potential energy at the end of the simulation
+#    potential = simulation.context.getState(getEnergy=True).getPotentialEnergy().value_in_unit(unit.kilojoule/unit.mole)
+#    return potential
+
+# Return mean potential energy during the simulation
+    with open(f'{outpath}/sim.log','r') as log_file: 
+        lines = log_file.readlines()
+        mean = 0
+    for i in range(1,len(lines)):
+        potential = float(lines[i].split(',')[1])
+        mean = mean + potential
+    potential = mean/(len(lines)-1)
     return potential
-    
+	
