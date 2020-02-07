@@ -1,6 +1,7 @@
 from simtk.openmm import app
 import simtk.openmm as mm
 from simtk import unit
+import solventlessPdbReporter as nosol
 
 def MinimizedEnergy(filepath):
     prmtop = app.AmberPrmtopFile(f'{filepath}.prmtop')
@@ -71,6 +72,7 @@ def simulation(filepath, outpath, nsteps):
     simulation.minimizeEnergy()
     if nsteps != 0:
         simulation.reporters.append(app.DCDReporter(f'{outpath}/traj.dcd', 25000)) # snapshot at every 50 ps 
+        simulation.reporters.append(nosol.NewPDBReporter(f'{outpath}/system_nosol.pdb', 25000)) # snapshot at every 50 ps 
         simulation.reporters.append(app.StateDataReporter(f'{outpath}/sim.log', 25000, step=True,
         potentialEnergy=True, temperature=True)) # reporting at every 50 ps
         simulation.reporters.append(app.CheckpointReporter(f'{outpath}/traj.chk', 250000)) # checkpoint at every 0.5 ns
