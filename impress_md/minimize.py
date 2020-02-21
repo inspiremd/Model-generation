@@ -71,21 +71,21 @@ def simulation(filepath, outpath, nsteps):
     simulation.context.setPositions(modeller.positions)
     simulation.minimizeEnergy()
     if nsteps != 0:
-        simulation.reporters.append(app.DCDReporter(f'{outpath}/traj.dcd', 25000)) # snapshot at every 50 ps 
-        simulation.reporters.append(nosol.NewPDBReporter(f'{outpath}/system_nosol.pdb', 25000)) # snapshot at every 50 ps 
-        simulation.reporters.append(app.StateDataReporter(f'{outpath}/sim.log', 25000, step=True,
+        simulation.reporters.append(app.DCDReporter(f'{outpath}_traj.dcd', 25000)) # snapshot at every 50 ps 
+        simulation.reporters.append(nosol.NewPDBReporter(f'{outpath}_system_nosol.pdb', 25000)) # snapshot at every 50 ps 
+        simulation.reporters.append(app.StateDataReporter(f'{outpath}_sim.log', 25000, step=True,
         potentialEnergy=True, temperature=True)) # reporting at every 50 ps
-        simulation.reporters.append(app.CheckpointReporter(f'{outpath}/traj.chk', 250000)) # checkpoint at every 0.5 ns
+        simulation.reporters.append(app.CheckpointReporter(f'{outpath}_traj.chk', 250000)) # checkpoint at every 0.5 ns
         simulation.step(nsteps)
         positions = simulation.context.getState(getPositions=True).getPositions()
-        app.PDBFile.writeFile(simulation.topology, positions, open(f'{outpath}/output.pdb', 'w'))
+        app.PDBFile.writeFile(simulation.topology, positions, open(f'{outpath}_output.pdb', 'w'))
 
 # Return potential energy at the end of the simulation
 #    potential = simulation.context.getState(getEnergy=True).getPotentialEnergy().value_in_unit(unit.kilojoule/unit.mole)
 #    return potential
 
 # Return mean potential energy during the simulation
-    with open(f'{outpath}/sim.log','r') as log_file: 
+    with open(f'{outpath}_sim.log','r') as log_file: 
         lines = log_file.readlines()
         mean = 0
     for i in range(1,len(lines)):
@@ -93,4 +93,26 @@ def simulation(filepath, outpath, nsteps):
         mean = mean + potential
     potential = mean/(len(lines)-1)
     return potential
+
+def MMGBSA(inpath, tmppath, comp):
+    prmtop = app.AmberPrmtopFile(f'{inpath}/{comp}.prmtop')
+    system = prmtop.createSystem(implicitSolvent=app.GBn2, nonbondedMethod=app.CutoffNonPeriodic, 
+            nonbondedCutoff=1.0*unit.nanometer, constraints=app.HBonds)
+    integrator = mm.LangevinIntegrator(300*unit.kelvin, 1.0/unit.picosecond, 0.002*unit.picosecond)
+    platform = mm.Platform.getPlatformByName('CUDA')
+    properties = {'Precision': 'double'}
+    simulation = app.Simulation(prmtop.topology, system, integrator, platform, properties)
+    
+    import os, glob
+    mean = 0
+    cnt = 0
+    for file in glob.glob(os.path.join(tmppath, comp + '_MMGBSA_snap*.pdb')):
+        pdb = app.PDBFile(file)
+        simulation.context.setPositions(pdb.positions)
+        potential = simulation.context.getState(getEnergy=True).getPotentialEnergy().value_in_unit(unit.kilojoule/unit.mole)
+        mean = mean + potential
+        cnt += 1
+    potential = mean/cnt
+    return potential
+
 	

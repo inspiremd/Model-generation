@@ -203,14 +203,14 @@ def Simulation_explicit(inpath, outpath, nsteps, comp='com'):
     from . import minimize
     success = True
     try:
-        potential = minimize.simulation(f'{inpath}/{comp}', outpath, nsteps)
+        potential = minimize.simulation(f'{inpath}/{comp}', f'{outpath}/{comp}', nsteps)
     except:
         success = False
 
     with open(f'{inpath}/metrics.csv','r') as metrics:
         dat = metrics.readlines()
     with open(f'{inpath}/metrics.csv','w') as metrics:
-        metrics.write(dat[0].replace('\n',',U_mean_explicit\n'))
+        metrics.write(dat[0].replace('\n',f',{comp}_U_mean_explicit\n'))
         if success:
             metrics.write(dat[1].replace('\n',',{}\n'.format(potential)))
         else:
@@ -219,6 +219,65 @@ def Simulation_explicit(inpath, outpath, nsteps, comp='com'):
         return potential
     else:
         return np.nan
+
+
+def RunMMGBSA_explicit(inpath, outpath, 3_traj='no'):
+    """
+    Extracts conformations from the trajectories and calculates potential energy using GB forcefields (MMGBSA energy).
+    """
+    from . import minimize
+    import traj_parser as tp
+
+    tmppath = outpath + '/tmp'
+    if not os.path.exists(tmppath):
+        os.mkdir(tmppath)
+
+    if 3_traj == 'yes':
+        comp = 'com'
+        tp.extractconfs(outpath, tmppath, comp)
+        comp = 'apo'
+        tp.extractconfs(outpath, tmppath, comp)
+        comp = 'lig'
+        tp.extractconfs(outpath, tmppath, comp)
+    else:
+        comp = 'com'
+        tp.extractconfs(outpath, tmppath, comp)
+        import os, glob
+        for file in glob.glob(os.path.join(tmppath, 'com_MMGBSA_snap*.pdb')):
+            name = file.split('/')[-1]
+            rec_name = tmppath + '/' + name.replace('com', 'apo', 1)
+            lig_name = tmppath + '/' + name.replace('com', 'lig', 1)
+            ## This may not be the best way to split pdb but it works assuming that we only have one
+            ## ligand which is also the last residue in the complex pdb. MDAnalysis can do this easily and in a
+            ## robust manner, but I wanted to avoid dependencies, so coded it this way.
+            tp.splitpdb(file, rec_name, lig_name)
+
+    success = True
+    try:
+        comp = 'com'
+        com_energy = minimize.MMGBSA(inpath, tmppath, comp)
+        comp = 'apo'
+        rec_energy = minimize.MMGBSA(inpath, tmppath, comp)
+        comp = 'lig'
+        lig_energy = minimize.MMGBSA(inpath, tmppath, comp)
+        diff_energy = com_energy - lig_energy - rec_energy
+    except:
+        success = False
+
+    with open(f'{inpath}/metrics.csv','r') as metrics:
+        dat = metrics.readlines()
+    with open(f'{inpath}/metrics.csv','w') as metrics:
+        metrics.write(dat[0].replace('\n',',del_G_MMGBSA\n'))
+        if success:
+            metrics.write(dat[1].replace('\n',',{}\n'.format(diff_energy)))
+        else:
+            metrics.write(dat[1].replace('\n',',NA\n'))
+
+    if success:
+        return diff_energy
+    else:
+        return np.nan
+
 
 def RunMMGBSA(inpath, outpath, niter=1000):
     """

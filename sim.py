@@ -34,7 +34,7 @@ if __name__ == '__main__':
         nsteps = round(float(arguments['-n'])*500000)  # assuming timestep of 2 fs
 
     potential = interface_functions.Simulation_explicit(inpath, outpath, nsteps, comp)
-    with open(f'{outpath}/simulation_explicit.log',"w+") as logf:
+    with open(f'{outpath}/{comp}_simulation_explicit.log',"w+") as logf:
         logf.write("Mean potential energy of the simulated system is {} kJ/mol.\n".format(potential))
         logf.write("Execution time (sec): {}\n".format(timeit.default_timer() - start))
 
