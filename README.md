@@ -35,6 +35,23 @@ There are two command line executables.
 * Output adds to the metrics.csv file
 * Dependencies: OpenMM, numpy, pymbar, docopt
 
+## sim.py
+* Performs MD simulation of the given system after solvating it with explicit water molecules.
+* This command should only be run after docking.py and param.py.
+* Input is path to the directory where the coordinates and parameters (AMBER format) of the system are saved. This should be the output path for docking.py.
+* Takes as input the component to be simulated (complex, protein or ligand) and the nanosecond length of the simulation. 0 corresponds to energy minimisation.
+* Output is added to the metrics.csv file.
+* Dependencies: OpenMM, docopt
+
+## mmgbsa_explicit.py
+* Computes binding free energy estimates (MMGBSA) taking conformations from MD simulations(s).
+* This command should only be run after sim.py.
+* Input path is the location of parameters (AMBER format) for the system. Should be the same as used for sim.py.
+* Output path is the location of trajectory files, that is the output path of sim.py.
+* User has the choice of performing 1-traj or 3-traj versions of MMGBSA.
+* Output is added to the metrics.csv file.
+* Dependencies: OpenMM, docopt
+
 ## alchem.py
 * Uses an alchemical method to calculate the absolute binding free energy of a ligand.
 * User enters the number of lambda windows and the length of simulation at each window.

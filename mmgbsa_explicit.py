@@ -1,4 +1,4 @@
-"""INSPIRE MMGBSA Calculator - Computes binding free energy estimates taking conformations from simulation(s) in explicit solvent.
+"""INSPIRE MMGBSA Calculator - Computes binding free energy estimates taking conformations from MD simulation(s).
 
 Usage:
   mmgbsa_explicit.py -i=<STRUCTURES> [-o=<TRAJECTORY>] [-r=<REPLICAS>] [-m]
