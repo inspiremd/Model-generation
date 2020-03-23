@@ -94,6 +94,27 @@ def simulation(filepath, outpath, nsteps):
     potential = mean/(len(lines)-1)
     return potential
 
+def simulation_ESMACS(filepath, outpath, nsteps):
+    prmtop = app.AmberPrmtopFile(f'{filepath}_sol.prmtop')
+    inpcrd = app.AmberInpcrdFile(f'{filepath}_sol.inpcrd')
+    system = prmtop.createSystem(nonbondedMethod=app.PME, nonbondedCutoff=1.0*unit.nanometer,
+            constraints=app.HBonds)
+    integrator = mm.LangevinIntegrator(300*unit.kelvin, 1.0/unit.picosecond, 0.002*unit.picosecond)
+    platform = mm.Platform.getPlatformByName('CUDA')
+    properties = {'Precision': 'double'}
+    simulation = app.Simulation(prmtop.topology, system, integrator, platform, properties)
+    simulation.context.setPositions(inpcrd.positions)
+    if inpcrd.boxVectors is not None:
+        simulation.context.setPeriodicBoxVectors(*inpcrd.boxVectors)
+    simulation.minimizeEnergy()
+    simulation.reporters.append(app.DCDReporter(f'{outpath}/traj.dcd', 50000)) # snapshot at every 100 ps 
+    simulation.reporters.append(app.StateDataReporter(f'{outpath}/sim.log', 5000, step=True,
+    potentialEnergy=True, temperature=True)) # reporting at every 10 ps
+    simulation.reporters.append(app.CheckpointReporter(f'{outpath}/traj.chk', 250000)) # checkpoint at every 0.5 ns
+    simulation.step(nsteps)
+    positions = simulation.context.getState(getPositions=True).getPositions()
+    app.PDBFile.writeFile(simulation.topology, positions, open(f'{outpath}/output.pdb', 'w'))
+
 def MMGBSA(inpath, tmppath, comp):
     prmtop = app.AmberPrmtopFile(f'{inpath}/{comp}.prmtop')
     system = prmtop.createSystem(implicitSolvent=app.GBn2, nonbondedMethod=app.CutoffNonPeriodic, 

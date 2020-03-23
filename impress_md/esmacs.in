@@ -1,0 +1,10 @@
+&general
+        startframe=21, interval=1,
+        verbose=2, keep_files=2,
+/
+&gb
+        igb=5,
+/
+&pb
+        fillratio=4.0,
+/

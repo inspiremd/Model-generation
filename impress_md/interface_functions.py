@@ -107,11 +107,21 @@ def ParameterizeOE(path):
             leap.write("saveAmberParm lig lig.prmtop lig.inpcrd\n")
             leap.write("saveAmberParm com com.prmtop com.inpcrd\n")
             leap.write("savepdb com com.pdb\n")
+            leap.write("addIons2 rec NA 0\n")
+            leap.write("addIons2 rec CL 0\n")
+            leap.write("solvateBox rec TIP3PBOX 14\n")
+            leap.write("savepdb rec apo_sol.pdb\n")
+            leap.write("saveAmberParm rec apo_sol.prmtop apo_sol.inpcrd\n")
+            leap.write("addIons2 lig NA 0\n")
+            leap.write("addIons2 lig CL 0\n")
+            leap.write("solvateBox lig TIP3PBOX 14\n")
+            leap.write("savepdb lig lig_sol.pdb\n")
+            leap.write("saveAmberParm lig lig_sol.prmtop lig_sol.inpcrd\n")
             leap.write("addIons2 com NA 0\n")
             leap.write("addIons2 com CL 0\n")
             leap.write("solvateBox com TIP3PBOX 14\n")
-            leap.write("savepdb com complex.pdb\n")
-            leap.write("saveAmberParm com complex.prmtop complex.inpcrd\n")
+            leap.write("savepdb com com_sol.pdb\n")
+            leap.write("saveAmberParm com com_sol.prmtop com_sol.inpcrd\n")
             leap.write("quit\n")
         subprocess.check_output(f'tleap -f leap.in',shell=True)
 
@@ -140,11 +150,21 @@ def ParameterizeAMBER(path):
             leap.write("saveAmberParm lig lig.prmtop lig.inpcrd\n")
             leap.write("saveAmberParm com com.prmtop com.inpcrd\n")
             leap.write("savepdb com com.pdb\n")
+            leap.write("addIons2 rec NA 0\n")
+            leap.write("addIons2 rec CL 0\n")
+            leap.write("solvateBox rec TIP3PBOX 14\n")
+            leap.write("savepdb rec apo_sol.pdb\n")
+            leap.write("saveAmberParm rec apo_sol.prmtop apo_sol.inpcrd\n")
+            leap.write("addIons2 lig NA 0\n")
+            leap.write("addIons2 lig CL 0\n")
+            leap.write("solvateBox lig TIP3PBOX 14\n")
+            leap.write("savepdb lig lig_sol.pdb\n")
+            leap.write("saveAmberParm lig lig_sol.prmtop lig_sol.inpcrd\n")
             leap.write("addIons2 com NA 0\n")
             leap.write("addIons2 com CL 0\n")
             leap.write("solvateBox com TIP3PBOX 14\n")
-            leap.write("savepdb com complex.pdb\n")
-            leap.write("saveAmberParm com complex.prmtop complex.inpcrd\n")
+            leap.write("savepdb com com_sol.pdb\n")
+            leap.write("saveAmberParm com com_sol.prmtop com_sol.inpcrd\n")
             leap.write("quit\n")
         subprocess.check_output(f'tleap -f leap.in',shell=True)
     
@@ -234,6 +254,17 @@ def Simulation_explicit(inpath, outpath, nsteps, comp='com'):
     else:
         return np.nan
 
+def Simulation_ESMACS(inpath, outpath, nsteps, comp='com'):
+    inpath = os.path.join(inpath,comp)
+    outpath = os.path.join(outpath,comp,'rep1') # rep1 is temporary; it will range from 1 to replicas; to be worked out with RCT team.
+    if not os.path.exists(outpath):
+        os.mkdir(outpath)
+
+    from . import minimize
+    try:
+        minimize.simulation_ESMACS(inpath, outpath, nsteps)
+    except:
+        print('\nrep1 simulation did not finish successfully!\n')
 
 def RunMMGBSA_explicit(inpath, outpath, 3_traj='no'):
     """
