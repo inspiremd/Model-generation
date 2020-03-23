@@ -97,6 +97,7 @@ def ParameterizeOE(path):
         with open(f'leap.in','w+') as leap:
             leap.write("source leaprc.protein.ff14SBonlysc\n")
             leap.write("source leaprc.gaff\n")
+            leap.write("source leaprc.water.tip3p\n")
             leap.write("set default PBRadii mbondi3\n")
             leap.write("rec = loadPDB apo.pdb # May need full filepath?\n")
             leap.write("saveAmberParm rec apo.prmtop apo.inpcrd\n")
@@ -105,6 +106,12 @@ def ParameterizeOE(path):
             leap.write("com = combine {rec lig}\n")
             leap.write("saveAmberParm lig lig.prmtop lig.inpcrd\n")
             leap.write("saveAmberParm com com.prmtop com.inpcrd\n")
+            leap.write("savepdb com com.pdb\n")
+            leap.write("addIons2 com NA 0\n")
+            leap.write("addIons2 com CL 0\n")
+            leap.write("solvateBox com TIP3PBOX 14\n")
+            leap.write("savepdb com complex.pdb\n")
+            leap.write("saveAmberParm com complex.prmtop complex.inpcrd\n")
             leap.write("quit\n")
         subprocess.check_output(f'tleap -f leap.in',shell=True)
 
@@ -123,6 +130,7 @@ def ParameterizeAMBER(path):
         with open(f'leap.in','w+') as leap:
             leap.write("source leaprc.protein.ff14SBonlysc\n")
             leap.write("source leaprc.gaff\n")
+            leap.write("source leaprc.water.tip3p\n")
             leap.write("set default PBRadii mbondi3\n")
             leap.write("rec = loadPDB apo.pdb # May need full filepath?\n")
             leap.write("saveAmberParm rec apo.prmtop apo.inpcrd\n")
@@ -131,6 +139,12 @@ def ParameterizeAMBER(path):
             leap.write("com = combine {rec lig}\n")
             leap.write("saveAmberParm lig lig.prmtop lig.inpcrd\n")
             leap.write("saveAmberParm com com.prmtop com.inpcrd\n")
+            leap.write("savepdb com com.pdb\n")
+            leap.write("addIons2 com NA 0\n")
+            leap.write("addIons2 com CL 0\n")
+            leap.write("solvateBox com TIP3PBOX 14\n")
+            leap.write("savepdb com complex.pdb\n")
+            leap.write("saveAmberParm com complex.prmtop complex.inpcrd\n")
             leap.write("quit\n")
         subprocess.check_output(f'tleap -f leap.in',shell=True)
     
