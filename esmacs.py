@@ -33,29 +33,29 @@ if __name__ == '__main__':
         comp = 'com'
     else:
         comp = arguments['-c']
-    
+
     path = os.getcwd
     outpath1 = os.path.join(outpath,comp,'rep1') # rep1 is temporary; to be worked out with RCT team
     import subprocess
     with working_directory('outpath1'):
         if comp == 'com':
             subprocess.check_output(f'MMPBSA.py.MPI -O -i {path}/impress_md/esmacs.in -sp {inpath}/{comp}_sol.prmtop -cp {inpath}/com.prmtop -rp {inpath}/apo.prmtop -lp {inpath}/lig.prmtop -y {outpath1}/traj.dcd > {outpath1}/mmpbsa.log',shell=True) # number of MPI ranks = number of ns (excluding first 2 ns) * 10; 40 is default
-            subprocess.check_output(f'cat {outpath1}/_MMPBSA_complex_gb.mdout.{0..39} > {outpath}/_MMPBSA_complex_gb.mdout.all', shell=True)
-            subprocess.check_output(f'cat {outpath1}/_MMPBSA_complex_gb_surf.dat.{0..39} > {outpath}/_MMPBSA_complex_gb_surf.dat.all', shell=True)
-            subprocess.check_output(f'cat {outpath1}/_MMPBSA_complex_pb.mdout.{0..39} > {outpath}/_MMPBSA_complex_pb.mdout.all', shell=True)
-            subprocess.check_output(f'cat {outpath1}/_MMPBSA_ligand_gb.mdout.{0..39} > {outpath}/_MMPBSA_ligand_gb.mdout.all', shell=True)
-            subprocess.check_output(f'cat {outpath1}/_MMPBSA_ligand_gb_surf.dat.{0..39} > {outpath}/_MMPBSA_ligand_gb_surf.dat.all', shell=True)
-            subprocess.check_output(f'cat {outpath1}/_MMPBSA_ligand_pb.mdout.{0..39} > {outpath}/_MMPBSA_ligand_pb.mdout.all', shell=True)
-            subprocess.check_output(f'cat {outpath1}/_MMPBSA_receptor_gb.mdout.{0..39} > {outpath}/_MMPBSA_receptor_gb.mdout.all', shell=True)
-            subprocess.check_output(f'cat {outpath1}/_MMPBSA_receptor_gb_surf.dat.{0..39} > {outpath}/_MMPBSA_receptor_gb_surf.dat.all', shell=True)
-            subprocess.check_output(f'cat {outpath1}/_MMPBSA_receptor_pb.mdout.{0..39} > {outpath}/_MMPBSA_receptor_pb.mdout.all', shell=True)
-            subprocess.check_output(f'rm {outpath1}/_MMPBSA_*.{0..39} {outpath1}/reference.frc {outpath1}/*.inpcrd {outpath1}/*.mdin* {outpath1}/*.out', shell=True)
+            subprocess.check_output(f'ls {outpath1}/_MMPBSA_complex_gb.mdout.* | sort -V | xargs cat > {outpath}/_MMPBSA_complex_gb.mdout.all', shell=True)
+            subprocess.check_output(f'ls {outpath1}/_MMPBSA_complex_gb_surf.dat.* | sort -V | xargs cat > {outpath}/_MMPBSA_complex_gb_surf.dat.all', shell=True)
+            subprocess.check_output(f'ls {outpath1}/_MMPBSA_complex_pb.mdout.* | sort -V | xargs cat > {outpath}/_MMPBSA_complex_pb.mdout.all', shell=True)
+            subprocess.check_output(f'ls {outpath1}/_MMPBSA_ligand_gb.mdout.* | sort -V | xargs cat > {outpath}/_MMPBSA_ligand_gb.mdout.all', shell=True)
+            subprocess.check_output(f'ls {outpath1}/_MMPBSA_ligand_gb_surf.dat.* | sort -V | xargs cat > {outpath}/_MMPBSA_ligand_gb_surf.dat.all', shell=True)
+            subprocess.check_output(f'ls {outpath1}/_MMPBSA_ligand_pb.mdout.* | sort -V | xargs cat > {outpath}/_MMPBSA_ligand_pb.mdout.all', shell=True)
+            subprocess.check_output(f'ls {outpath1}/_MMPBSA_receptor_gb.mdout.* | sort -V | xargs cat > {outpath}/_MMPBSA_receptor_gb.mdout.all', shell=True)
+            subprocess.check_output(f'ls {outpath1}/_MMPBSA_receptor_gb_surf.dat.* | sort -V | xargs cat > {outpath}/_MMPBSA_receptor_gb_surf.dat.all', shell=True)
+            subprocess.check_output(f'ls {outpath1}/_MMPBSA_receptor_pb.mdout.* | sort -V | xargs cat > {outpath}/_MMPBSA_receptor_pb.mdout.all', shell=True)
+            subprocess.check_output(f'rm {outpath1}/_MMPBSA_*.[0-9]* {outpath1}/reference.frc {outpath1}/*.inpcrd {outpath1}/*.mdin* {outpath1}/*.out', shell=True)
          else:
             subprocess.check_output(f'MMPBSA.py.MPI -O -i {path}/impress_md/esmacs.in -sp {inpath}/{comp}_sol.prmtop -cp {inpath}/{comp}.prmtop -y {outpath1}/traj.dcd > {outpath1}/mmpbsa.log',shell=True) # number of MPI ranks = number of ns (excluding first 2 ns) * 10; 40 is default
-            subprocess.check_output(f'cat {outpath1}/_MMPBSA_complex_gb.mdout.{0..39} > {outpath}/_MMPBSA_complex_gb.mdout.all', shell=True)
-            subprocess.check_output(f'cat {outpath1}/_MMPBSA_complex_gb_surf.dat.{0..39} > {outpath}/_MMPBSA_complex_gb_surf.dat.all', shell=True)
-            subprocess.check_output(f'cat {outpath1}/_MMPBSA_complex_pb.mdout.{0..39} > {outpath}/_MMPBSA_complex_pb.mdout.all', shell=True)
-            subprocess.check_output(f'rm {outpath1}/_MMPBSA_*.{0..39} {outpath1}/reference.frc {outpath1}/*.inpcrd {outpath1}/*.mdin* {outpath1}/*.out', shell=True)
+            subprocess.check_output(f'ls {outpath1}/_MMPBSA_complex_gb.mdout.* | sort -V | xargs cat > {outpath}/_MMPBSA_complex_gb.mdout.all', shell=True)
+            subprocess.check_output(f'ls {outpath1}/_MMPBSA_complex_gb_surf.dat.* | sort -V | xargs cat > {outpath}/_MMPBSA_complex_gb_surf.dat.all', shell=True)
+            subprocess.check_output(f'ls {outpath1}/_MMPBSA_complex_pb.mdout.* | sort -V | xargs cat > {outpath}/_MMPBSA_complex_pb.mdout.all', shell=True)
+            subprocess.check_output(f'rm {outpath1}/_MMPBSA_*.[0-9]* {outpath1}/reference.frc {outpath1}/*.inpcrd {outpath1}/*.mdin* {outpath1}/*.out', shell=True)
 
     with open(f'{outpath}/esmacs.log',"w+") as logf:
         logf.write("Execution time (sec): {}\n".format(timeit.default_timer() - start))

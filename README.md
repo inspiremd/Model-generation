@@ -43,14 +43,30 @@ There are two command line executables.
 * Output is added to the metrics.csv file.
 * Dependencies: OpenMM, docopt
 
+## sim_esmacs.py
+* Performs MD simulation of the given solvated system and saves trajectories for ESMACS calculations.
+* Should only be run after docking and parameterisation steps have been successful.
+* Input path is path to the directory containing the AMBER topology and coordinate files (output path for `docking.py`).
+* Other inputs: component to be simulated (com, apo or lig), nanosecond length of simulation (first 2 ns considered equilibration) and ensemble size for ESMACS.
+* Should be called separately for each component in case of multiple trajectory version of ESMACS.
+* Dependencies: OpenMM, docopt
+
 ## mmgbsa_explicit.py
 * Computes binding free energy estimates (MMGBSA) taking conformations from MD simulations(s).
-* This command should only be run after sim.py.
-* Input path is the location of parameters (AMBER format) for the system. Should be the same as used for sim.py.
-* Output path is the location of trajectory files, that is the output path of sim.py.
+* This command should only be run after `sim.py`.
+* Input path is the location of parameters (AMBER format) for the system. Should be the same as used for `sim.py`.
+* Output path is the location of trajectory files, that is the output path of `sim.py`.
 * User has the choice of performing 1-traj or 3-traj versions of MMGBSA.
-* Output is added to the metrics.csv file.
+* Output is added to the `metrics.csv` file.
 * Dependencies: OpenMM, docopt
+
+## esmacs.py
+* Performs ESMACS related calculations on the solvated trajectories.
+* Should be only be executed after `sim_esmacs.py` has been successful.
+* Input and output paths should be the same as those used for `sim_esmacs.py`.
+* Other inputs: Ensemble size for ESMACS, component to be analysed.
+* Should be called separately for each component in case of multiple trajectory version of ESMACS.
+* Dependencies: AmberTools19, docopt
 
 ## alchem.py
 * Uses an alchemical method to calculate the absolute binding free energy of a ligand.
