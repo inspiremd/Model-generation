@@ -74,7 +74,7 @@ There are two command line executables.
 * Can be run on login nodes of Summit/local machine.
 * Input path should be the output path of `sim_esmacs.py` and `esmacs.py`.
 * Other inputs: Ensemble size for ESMACS, type of calculation (1, 2 or 3 traj).
-* Dependencies: docopt, R (Summit has its module so the scripts load them automatically).
+* Dependencies: docopt, R (Summit has its module so scripts load it automatically).
 
 ## alchem.py
 * Uses an alchemical method to calculate the absolute binding free energy of a ligand.
