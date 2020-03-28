@@ -22,7 +22,11 @@ start = timeit.default_timer()
 if __name__ == '__main__':
     arguments = docopt(__doc__, version='INSPIRE ESMACS Simulator 0.0.1')
     inpath = arguments['-i']
-    comp = arguments['-c']
+
+    if arguments['-c'] is None:
+        comp = 'com'
+    else:
+        comp = arguments['-c']
 #    replicas = arguments['-r']
     if arguments['-o'] is None:
         outpath = str(inpath)

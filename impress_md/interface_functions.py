@@ -230,7 +230,7 @@ def RunMinimization_(build_path, outpath, one_traj=False):
         return np.nan
 
 
-def Simulation_explicit(inpath, outpath, nsteps, comp='com'):
+def Simulation_explicit(inpath, outpath, nsteps, comp):
     if not os.path.exists(outpath):
         os.mkdir(outpath)
 
@@ -254,7 +254,7 @@ def Simulation_explicit(inpath, outpath, nsteps, comp='com'):
     else:
         return np.nan
 
-def Simulation_ESMACS(inpath, outpath, nsteps, comp='com'):
+def Simulation_ESMACS(inpath, outpath, nsteps, comp):
     inpath = os.path.join(inpath,comp)
     outpath = os.path.join(outpath,comp,'rep1') # rep1 is temporary; it will range from 1 to replicas; to be worked out with RCT team.
     if not os.path.exists(outpath):
@@ -266,18 +266,19 @@ def Simulation_ESMACS(inpath, outpath, nsteps, comp='com'):
     except:
         print('\nrep1 simulation did not finish successfully!\n')
 
-def RunMMGBSA_explicit(inpath, outpath, 3_traj='no'):
+def RunMMGBSA_explicit(inpath, outpath, three_traj):
     """
     Extracts conformations from the trajectories and calculates potential energy using GB forcefields (MMGBSA energy).
     """
     from . import minimize
     import traj_parser as tp
+    import os
 
     tmppath = outpath + '/tmp'
     if not os.path.exists(tmppath):
         os.mkdir(tmppath)
 
-    if 3_traj == 'yes':
+    if three_traj == 'yes':
         comp = 'com'
         tp.extractconfs(outpath, tmppath, comp)
         comp = 'apo'
@@ -287,7 +288,7 @@ def RunMMGBSA_explicit(inpath, outpath, 3_traj='no'):
     else:
         comp = 'com'
         tp.extractconfs(outpath, tmppath, comp)
-        import os, glob
+        import glob
         for file in glob.glob(os.path.join(tmppath, 'com_MMGBSA_snap*.pdb')):
             name = file.split('/')[-1]
             rec_name = tmppath + '/' + name.replace('com', 'apo', 1)

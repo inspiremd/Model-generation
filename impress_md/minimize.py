@@ -1,6 +1,8 @@
 from simtk.openmm import app
 import simtk.openmm as mm
 from simtk import unit
+import sys
+sys.path.append('./impress_md')
 import solventlessPdbReporter as nosol
 
 def MinimizedEnergy(filepath):

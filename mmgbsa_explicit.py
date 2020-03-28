@@ -23,13 +23,18 @@ start = timeit.default_timer()
 if __name__ == '__main__':
     arguments = docopt(__doc__, version='INSPIRE MMGBSA (explicit solvent) Calculator 0.0.1')
     inpath = arguments['-i']
-    3_traj = arguments['-m']
+
+    if arguments['-m'] is None:
+        three_traj = 'no'
+    else:
+        three_traj = arguments['-m']
+
     if arguments['-o'] is None:
         outpath = str(inpath)
     else:
         outpath = arguments['-o']
 
-    del_G = interface_functions.RunMMGBSA_explicit(inpath, outpath, 3_traj)
+    del_G = interface_functions.RunMMGBSA_explicit(inpath, outpath, three_traj)
     with open(f'{outpath}/mmgbsa_explicit.log',"w+") as logf:
         logf.write("The binding affinity (MMGBSA) of the system is {} kJ/mol\n".format(del_G))
         logf.write("Execution time (sec): {}\n".format(timeit.default_timer() - start))
