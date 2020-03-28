@@ -68,6 +68,14 @@ There are two command line executables.
 * Should be called separately for each component in case of multiple trajectory version of ESMACS.
 * Dependencies: AmberTools19, docopt
 
+## esmacs_analysi.py
+* Performs final ESMACS analysis on the MMPBSA output of AmberTools to give binding affinity along with its statistial uncertainty.
+* Should only be run after successfuly execution of `esamcs.py`.
+* Can be run on login nodes of Summit/local machine.
+* Input path should be the output path of `sim_esmacs.py` and `esmacs.py`.
+* Other inputs: Ensemble size for ESMACS, type of calculation (1, 2 or 3 traj).
+* Dependencies: docopt
+
 ## alchem.py
 * Uses an alchemical method to calculate the absolute binding free energy of a ligand.
 * User enters the number of lambda windows and the length of simulation at each window.

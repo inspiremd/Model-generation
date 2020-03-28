@@ -37,7 +37,7 @@ if __name__ == '__main__':
     path = os.getcwd
     outpath1 = os.path.join(outpath,comp,'rep1') # rep1 is temporary; to be worked out with RCT team
     import subprocess
-    with working_directory('outpath1'):
+    with interface_functions.working_directory('outpath1'):
         if comp == 'com':
             subprocess.check_output(f'MMPBSA.py.MPI -O -i {path}/impress_md/esmacs.in -sp {inpath}/{comp}_sol.prmtop -cp {inpath}/com.prmtop -rp {inpath}/apo.prmtop -lp {inpath}/lig.prmtop -y {outpath1}/traj.dcd > {outpath1}/mmpbsa.log',shell=True) # number of MPI ranks = number of ns (excluding first 2 ns) * 10; 40 is default
             subprocess.check_output(f'ls {outpath1}/_MMPBSA_complex_gb.mdout.* | sort -V | xargs cat > {outpath}/_MMPBSA_complex_gb.mdout.all', shell=True)
