@@ -264,7 +264,7 @@ def Simulation_ESMACS(inpath, outpath, nsteps, replica, comp):
     try:
         minimize.simulation_ESMACS(inpath, outpath, nsteps)
     except:
-        print('\nrep1 simulation did not finish successfully!\n')
+        print('\nrep{} simulation did not finish successfully!\n'.format(replica))
 
 def RunMMGBSA_explicit(inpath, outpath, three_traj):
     """
