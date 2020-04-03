@@ -254,9 +254,9 @@ def Simulation_explicit(inpath, outpath, nsteps, comp):
     else:
         return np.nan
 
-def Simulation_ESMACS(inpath, outpath, nsteps, comp):
+def Simulation_ESMACS(inpath, outpath, nsteps, replica, comp):
     inpath = os.path.join(inpath,comp)
-    outpath = os.path.join(outpath,comp,'rep1') # rep1 is temporary; it will range from 1 to replicas; to be worked out with RCT team.
+    outpath = os.path.join(outpath,comp,'rep'+str(replica)) 
     if not os.path.exists(outpath):
         os.mkdir(outpath)
 

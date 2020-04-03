@@ -1,7 +1,7 @@
 """INSPIRE ESMACS Calculator - Computes binding free energy estimates taking conformations from MD simulation(s).
 
 Usage:
-  esmacs.py -i=<STRUCTURES> [-o=<TRAJECTORY>] [-r=<REPLICAS>] [-c=<COMPONENT>]
+  esmacs.py -i=<STRUCTURES> -r=<REPLICA_ID> [-o=<TRAJECTORY>] [-c=<COMPONENT>]
   esmacs.py (-h | --help)
   esmacs.py --version
 
@@ -10,7 +10,7 @@ Options:
   --version         Show version.
   -i=<STRUCTURES>   Path to input files containing AMBER format topology of the system (same as the input path used for sim_esmacs.py).
   -o=<TRAJECTORY>   Path to files containing output of sim_esmacs.py [default=same as input path].
-  -r=<REPLICAS>     Ensemble size for ESMACS; same as that used in sim_esmacs.py NOT CURRENTLY IN USE (To be worked out with RCT team).
+  -r=<REPLICA_ID>   Replica ID for ESMACS (varies from 1 to ENSEMBLE SIZE, which must be the same as for sim_esmacs.py). Standard ENSEMBLE SIZE is 25, but used 24 on Summit.
   -c=<COMPONENT>    complex -> 'com', protein -> 'apo', ligand -> 'lig' [default='com']. 'com' is always needed; others only in case of 2- or 3-traj ESMACS when independent simulations have been run for other components.
 
 """
@@ -23,7 +23,12 @@ start = timeit.default_timer()
 if __name__ == '__main__':
     arguments = docopt(__doc__, version='INSPIRE ESMACS Calculator 0.0.1')
     inpath = arguments['-i']
-#    replicas = arguments['-r'] # to be worked out with RCT team
+
+    if arguments['-r'] is None:
+        sys.exit("\nReplica ID not provided.\n") 
+    else:   
+        replica = arguments['-r']
+
     if arguments['-o'] is None:
         outpath = str(inpath)
     else:
@@ -35,7 +40,7 @@ if __name__ == '__main__':
         comp = arguments['-c']
 
     path = os.getcwd
-    outpath1 = os.path.join(outpath,comp,'rep1') # rep1 is temporary; to be worked out with RCT team
+    outpath1 = os.path.join(outpath,comp,'rep' + str(replica)) 
     import subprocess
     with interface_functions.working_directory('outpath1'):
         if comp == 'com':
