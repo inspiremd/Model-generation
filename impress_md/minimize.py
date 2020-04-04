@@ -61,7 +61,7 @@ def MinimizedEnergy(filepath):
 def simulation(filepath, outpath, nsteps):
     prmtop = app.AmberPrmtopFile(f'{filepath}.prmtop')
     inpcrd = app.AmberInpcrdFile(f'{filepath}.inpcrd')
-    forcefield = app.ForceField('amber14-all.xml', 'amber14/tip3p.xml')
+    forcefield = app.ForceField('amber14-all.xml', 'amber14/tip3p.xml')  # gaff/gaff2/other ligand ff also required here or it may complain for 'com' or 'lig' 
     modeller = app.Modeller(prmtop.topology, inpcrd.positions)
     modeller.addSolvent(forcefield, padding=1.4*unit.nanometer)
     system = forcefield.createSystem(modeller.topology, nonbondedMethod=app.PME, nonbondedCutoff=1.0*unit.nanometer,

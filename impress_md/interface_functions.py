@@ -232,7 +232,7 @@ def RunMinimization_(build_path, outpath, one_traj=False):
 
 def Simulation_explicit(inpath, outpath, nsteps, comp):
     if not os.path.exists(outpath):
-        os.mkdir(outpath)
+        os.makedirs(outpath)
 
     from . import minimize
     success = True
@@ -258,7 +258,7 @@ def Simulation_ESMACS(inpath, outpath, nsteps, replica, comp):
     inpath = os.path.join(inpath,comp)
     outpath = os.path.join(outpath,comp,'rep'+str(replica)) 
     if not os.path.exists(outpath):
-        os.mkdir(outpath)
+        os.makedirs(outpath)
 
     from . import minimize
     try:
@@ -276,7 +276,7 @@ def RunMMGBSA_explicit(inpath, outpath, three_traj):
 
     tmppath = outpath + '/tmp'
     if not os.path.exists(tmppath):
-        os.mkdir(tmppath)
+        os.makedirs(tmppath)
 
     if three_traj == 'yes':
         comp = 'com'
