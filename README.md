@@ -62,9 +62,9 @@ There are two command line executables.
 
 ## esmacs_analysis.py
 * Performs final ESMACS analysis on the MMPBSA output of AmberTools to give binding affinity along with its statistial uncertainty.
-* Should only be run after successfuly execution of `esamcs.py`.
+* Should only be run after successfuly execution of MMPBSA step of ESMACS either using `raw_submission_esmacs.sh` or using `workflow-3.py`, both of which can only be run after successful execution of `sim_esmacs.py` (with or without `workflow-3.py`).
 * Can be run on login nodes of Summit/local machine.
-* Input path should be the output path of `sim_esmacs.py` and `esmacs.py`.
+* Input path should be the output path of `sim_esmacs.py` and MMPBSA.
 * Other inputs: Ensemble size for ESMACS, type of calculation (1, 2 or 3 traj).
 * Dependencies: docopt, R (Summit has its module so scripts load it automatically).
 
