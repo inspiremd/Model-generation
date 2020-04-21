@@ -2,7 +2,7 @@ from simtk.openmm import app
 import simtk.openmm as mm
 from simtk import unit
 import sys
-sys.path.append('./impress_md')
+sys.path.append('/gpfs/alpine/scratch/apbhati/chm155/Model-generation/impress_md')
 import solventlessPdbReporter as nosol
 
 def MinimizedEnergy(filepath):

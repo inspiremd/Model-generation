@@ -60,14 +60,6 @@ There are two command line executables.
 * Output is added to the `metrics.csv` file.
 * Dependencies: OpenMM, docopt
 
-## esmacs.py
-* Performs ESMACS related calculations on the solvated trajectories.
-* Should be only be executed after `sim_esmacs.py` has been successful.
-* Input and output paths should be the same as those used for `sim_esmacs.py`.
-* Other inputs: Ensemble size for ESMACS, component to be analysed.
-* Should be called separately for each component in case of multiple trajectory version of ESMACS.
-* Dependencies: AmberTools19, docopt
-
 ## esmacs_analysis.py
 * Performs final ESMACS analysis on the MMPBSA output of AmberTools to give binding affinity along with its statistial uncertainty.
 * Should only be run after successfuly execution of `esamcs.py`.
